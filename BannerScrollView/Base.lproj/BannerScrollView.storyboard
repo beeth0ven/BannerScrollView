@@ -4,6 +4,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -53,16 +54,21 @@
                                         <rect key="frame" x="0.0" y="335" width="600" height="25"/>
                                         <subviews>
                                             <pageControl opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="Lts-tz-GRc">
-                                                <rect key="frame" x="550" y="-6" width="50" height="37"/>
+                                                <rect key="frame" x="553" y="-6" width="39" height="37"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="37" id="KKR-cA-le2"/>
                                                     <constraint firstAttribute="width" constant="50" id="P0B-Fu-SXn"/>
                                                 </constraints>
                                                 <color key="pageIndicatorTintColor" red="0.74117647060000003" green="0.69411764710000001" blue="0.63137254899999995" alpha="1" colorSpace="calibratedRGB"/>
                                                 <color key="currentPageIndicatorTintColor" red="0.81568627449999997" green="0.32156862749999998" blue="0.019607843140000001" alpha="1" colorSpace="calibratedRGB"/>
+                                                <variation key="default">
+                                                    <mask key="constraints">
+                                                        <exclude reference="P0B-Fu-SXn"/>
+                                                    </mask>
+                                                </variation>
                                             </pageControl>
-                                            <label opaque="NO" userInteractionEnabled="NO" tag="3" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dPd-kS-hxE">
-                                                <rect key="frame" x="10" y="0.0" width="482" height="25"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" tag="3" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dPd-kS-hxE">
+                                                <rect key="frame" x="8" y="0.0" width="584" height="25"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -71,8 +77,12 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.59999999999999998" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="25" id="2Pd-9j-tmo"/>
-                                            <constraint firstAttribute="trailing" secondItem="Lts-tz-GRc" secondAttribute="trailing" id="IJ7-mJ-2Pe"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="Lts-tz-GRc" secondAttribute="trailing" id="IJ7-mJ-2Pe"/>
                                             <constraint firstAttribute="bottom" secondItem="Lts-tz-GRc" secondAttribute="bottom" constant="-6" id="OhD-OA-wxN"/>
+                                            <constraint firstItem="dPd-kS-hxE" firstAttribute="leading" secondItem="Ifw-ap-5PD" secondAttribute="leadingMargin" id="UZf-OG-OaM"/>
+                                            <constraint firstItem="dPd-kS-hxE" firstAttribute="top" secondItem="Ifw-ap-5PD" secondAttribute="top" id="Wgz-Zq-KvN"/>
+                                            <constraint firstAttribute="bottom" secondItem="dPd-kS-hxE" secondAttribute="bottom" id="wZv-Pa-OZY"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="dPd-kS-hxE" secondAttribute="trailing" id="z3n-ww-uVd"/>
                                         </constraints>
                                     </view>
                                 </subviews>

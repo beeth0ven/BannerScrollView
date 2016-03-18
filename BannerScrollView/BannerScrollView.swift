@@ -75,20 +75,20 @@ class ViewController: UIViewController {
 
 class BannerScrollView: UIView, UIScrollViewDelegate {
     
-    var banners: [BannerType]? { didSet { reloadData() } }
+    var banners = [BannerType]() { didSet { reloadData() } }
     
     var didSelectBanner: (BannerType -> Void)?
     
-    private var currentIndex = 0 { didSet { updateUI() } }
+    private var currentIndex = 0
     
     private var currentBanner: BannerType? {
-        guard let banners = banners
-            where currentIndex < banners.endIndex else { return nil }
-        return banners[currentIndex]
+        let index = currentIndex % banners.count
+        return banners[index]
     }
     
-    private var bannersCount: Int {
-        return banners?.count ?? 0
+    private var realIndex: Int {
+        get { return currentIndex + 1 }
+        set { currentIndex = newValue - 1 }
     }
     
     private var scrollView: UIScrollView {
@@ -142,23 +142,36 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     }
     
     private func nextPage() {
-        currentIndex = (currentIndex + 1) % bannersCount
+        let index = (currentIndex + 1) % banners.count
+        let animated = !(index == 0)
+        updateWithCurrentIndex(index, animated: animated)
+        print("nextPage currentIndex: \(currentIndex)")
     }
     
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        currentIndex = Int(scrollView.contentOffset.x / bounds.width)
+        realIndex = Int(scrollView.contentOffset.x / bounds.width)
+        if currentIndex == banners.endIndex {
+            updateWithCurrentIndex(0)
+        } else if currentIndex == -1 {
+            updateWithCurrentIndex(banners.endIndex.predecessor())
+        } else {
+            updateWithCurrentIndex(currentIndex)
+        }
     }
     
     private func reloadData() {
-        
-        contentView.subviews.forEach { $0.removeFromSuperview() }
-        
-        contentWidth = CGFloat(bannersCount) * bounds.width
-        pageControl.numberOfPages = bannersCount
-        
         startTimer()
-        
-        guard let banners = banners else { return }
+        contentView.subviews.forEach { $0.removeFromSuperview() }
+        contentWidth = CGFloat(banners.count + 2) * bounds.width
+        addImageViews()
+        pageControl.numberOfPages = banners.count
+        updateWithCurrentIndex(0)
+    }
+    
+    func addImageViews() {
+        guard !self.banners.isEmpty else { return }
+        var banners = self.banners + [self.banners.first!]
+        banners += [self.banners.last!]
         
         for (index, banner) in banners.enumerate() {
             let x = CGFloat(index) * bounds.width
@@ -171,16 +184,17 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             imageView.addGestureRecognizer(tapGesture)
             contentView.addSubview(imageView)
         }
-        
-        currentIndex = 0
     }
     
-    private func updateUI() {
+    private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
+        print("currentIndex: \(currentIndex)")
+        currentIndex = index
         pageControl.currentPage = currentIndex
         titleLabel.text = currentBanner?.bannerTitle
-        let offset = CGPoint(x: CGFloat(currentIndex) * bounds.width, y: 0)
-        scrollView.setContentOffset(offset, animated: currentIndex != 0)
+        let offset = CGPoint(x: CGFloat(realIndex) * bounds.width, y: 0)
+        scrollView.setContentOffset(offset, animated: animated)
     }
+
 }
 
 

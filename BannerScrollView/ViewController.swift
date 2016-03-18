@@ -9,17 +9,26 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
+    @IBOutlet weak var bannerScrollView: BannerScrollView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        bannerScrollView.didSelectBanner = { banner in
+            let course = banner as! Course
+            print("pushCourseViewController with id: \(course.id)")
+        }
+        
+        Queue.Main.executeAfter(seconds: 2) {
+            
+            let banners: [BannerType] = [
+                Course(id: 0, name: "扬琴艺术", photo: photo1),
+                Course(id: 1, name: "演奏技巧", photo: photo2)
+            ]
+            
+            self.bannerScrollView.banners = banners
+        }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
+    
 }
-

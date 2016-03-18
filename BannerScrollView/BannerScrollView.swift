@@ -128,7 +128,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             scrollView.delegate = self
         }
     }
-     func imageTaped(gesture: UIGestureRecognizer) {
+    func imageTaped(gesture: UIGestureRecognizer) {
         guard let currentBanner = currentBanner else { return }
         didSelectBanner?(currentBanner)
     }
@@ -145,7 +145,6 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         let index = (currentIndex + 1) % banners.count
         let animated = !(index == 0)
         updateWithCurrentIndex(index, animated: animated)
-        print("nextPage currentIndex: \(currentIndex)")
     }
     
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
@@ -170,8 +169,8 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     
     func addImageViews() {
         guard !self.banners.isEmpty else { return }
-        var banners = self.banners + [self.banners.first!]
-        banners += [self.banners.last!]
+        var banners = [self.banners.last!] + self.banners
+        banners += [self.banners.first!]
         
         for (index, banner) in banners.enumerate() {
             let x = CGFloat(index) * bounds.width
@@ -184,17 +183,18 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             imageView.addGestureRecognizer(tapGesture)
             contentView.addSubview(imageView)
         }
+        
+        print(banners)
     }
     
     private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
-        print("currentIndex: \(currentIndex)")
         currentIndex = index
         pageControl.currentPage = currentIndex
         titleLabel.text = currentBanner?.bannerTitle
         let offset = CGPoint(x: CGFloat(realIndex) * bounds.width, y: 0)
         scrollView.setContentOffset(offset, animated: animated)
     }
-
+    
 }
 
 

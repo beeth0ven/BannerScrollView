@@ -150,6 +150,8 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         updateBannerFrames()
+        
+        //        print(bounds.size)
     }
     
     private func updateBannerFrames() {
@@ -167,11 +169,12 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         reloadImageViews()
         updateWithCurrentIndex(0)
         pageControl.numberOfPages = banners.count
-        layoutSubviews() // Update Size in Cell
+        layoutSubviews() // Force Update Size in Cell
     }
     
     func reloadImageViews() {
         contentView.subviews.removeFromSuperview()
+        
         for banner in realBanners {
             let imageView = UIImageView()
             imageView.userInteractionEnabled = true
@@ -181,6 +184,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             imageView.addGestureRecognizer(tapGesture)
             contentView.addSubview(imageView)
         }
+        
     }
     
     private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
@@ -222,7 +226,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             updateWithCurrentIndex(currentIndex)
         }
     }
-
+    
 }
 
 

@@ -9,6 +9,12 @@
 
 import UIKit
 
+extension Array where Element: UIView {
+    func removeFromSuperview() {
+        forEach { $0.removeFromSuperview() }
+    }
+}
+
 extension Array {
     func find(@noescape predicate: (Element) -> Bool) -> Element? {
         return filter(predicate).first

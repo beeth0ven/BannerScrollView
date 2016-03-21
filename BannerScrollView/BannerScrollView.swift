@@ -170,7 +170,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     }
     
     func reloadImageViews() {
-        contentView.subviews.forEach { $0.removeFromSuperview() }
+        contentView.subviews.removeFromSuperview()
         for banner in realBanners {
             let imageView = UIImageView()
             imageView.userInteractionEnabled = true

@@ -150,8 +150,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         updateBannerFrames()
-        
-        //        print(bounds.size)
+        updateWithCurrentIndex(currentIndex)
     }
     
     private func updateBannerFrames() {
@@ -164,10 +163,11 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     
     // MARK: Update UI
     
+    
     private func reloadData() {
-        startTimer()
+        startTimerIfNeeded()
         reloadImageViews()
-        updateWithCurrentIndex(0)
+        currentIndex = 0
         pageControl.numberOfPages = banners.count
         layoutSubviews() // Force Update Size in Cell
     }
@@ -196,6 +196,15 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     }
     
     // MARK: IBAction
+    
+    private var timerStarted = false
+    
+    private func startTimerIfNeeded() {
+        if !timerStarted {
+            timerStarted = true
+            startTimer()
+        }
+    }
     
     private func startTimer() {
         timer(5) { [weak self] time, _ in

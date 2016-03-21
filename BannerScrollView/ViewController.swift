@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         
         bannerScrollView.banners = [
             Course(id: 0, name: "扬琴艺术", photo: photo1),
-//            Course(id: 1, name: "演奏技巧", photo: photo2)
+            Course(id: 1, name: "演奏技巧", photo: photo2)
         ]
     }
     

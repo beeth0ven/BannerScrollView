@@ -167,6 +167,7 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         reloadImageViews()
         updateWithCurrentIndex(0)
         pageControl.numberOfPages = banners.count
+        layoutSubviews() // Update Size in Cell
     }
     
     func reloadImageViews() {

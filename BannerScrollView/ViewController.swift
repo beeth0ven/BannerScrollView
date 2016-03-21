@@ -20,15 +20,10 @@ class ViewController: UIViewController {
             print("pushCourseViewController with id: \(course.id)")
         }
         
-        Queue.Main.executeAfter(seconds: 2) {
-            
-            let banners: [BannerType] = [
-                Course(id: 0, name: "扬琴艺术", photo: photo1),
-                Course(id: 1, name: "演奏技巧", photo: photo2)
-            ]
-            
-            self.bannerScrollView.banners = banners
-        }
+        bannerScrollView.banners = [
+            Course(id: 0, name: "扬琴艺术", photo: photo1),
+//            Course(id: 1, name: "演奏技巧", photo: photo2)
+        ]
     }
     
 }

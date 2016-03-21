@@ -57,58 +57,83 @@ class ViewController: UIViewController {
             let course = banner as! Course
             print("pushCourseViewController with id: \(course.id)")
         }
-        
-        Queue.Main.executeAfter(seconds: 2) {
-            
-            let banners: [BannerType] = [
-                Course(id: 0, name: "扬琴艺术", photo: photo1),
-                Course(id: 1, name: "演奏技巧", photo: photo2)
-            ]
-            
-            self.bannerScrollView.banners = banners
-        }
+ 
+        self.bannerScrollView.banners = [
+            Course(id: 0, name: "扬琴艺术", photo: photo1),
+            Course(id: 1, name: "演奏技巧", photo: photo2)
+        ]
     }
-    
+ 
 }
 ```
 */
 
 class BannerScrollView: UIView, UIScrollViewDelegate {
     
+    // MARK: Public
+    
     var banners = [BannerType]() { didSet { reloadData() } }
     
     var didSelectBanner: (BannerType -> Void)?
     
+    // MARK: Properties
+    
     private var currentIndex = 0
     
     private var currentBanner: BannerType? {
+        if banners.isEmpty { return nil }
         let index = currentIndex % banners.count
         return banners[index]
     }
     
+    private var realBanners: [BannerType] {
+        
+        if self.banners.count < 2 {
+            return self.banners
+        }
+        
+        var banners = [self.banners.last!] + self.banners
+        banners += [self.banners.first!]
+        return banners
+    }
+    
     private var realIndex: Int {
-        get { return currentIndex + 1 }
-        set { currentIndex = newValue - 1 }
+        get {
+            if self.banners.count < 2 {
+                return currentIndex
+            }
+            return currentIndex + 1
+        }
+        set {
+            if self.banners.count < 2 {
+                currentIndex = 0
+            }
+            currentIndex = newValue - 1
+        }
     }
     
-    private var scrollView: UIScrollView {
-        return viewWithTag(1) as! UIScrollView
+    private var scrollView: UIScrollView! {
+        guard let scrollView = viewWithTag(1) as? UIScrollView else { return nil }
+        if scrollView.delegate == nil {
+            scrollView.delegate = self
+        }
+        return scrollView
     }
     
-    private var contentView: UIView {
-        return viewWithTag(5)!
+    private var contentView: UIView! {
+        return viewWithTag(5)
     }
     
-    private var bottomMaskView: UIView {
-        return viewWithTag(2)!
+    private var bottomMaskView: UIView! {
+        return viewWithTag(2)
     }
     
-    private var titleLabel: UILabel {
-        return viewWithTag(3) as! UILabel
+    private var titleLabel: UILabel! {
+        return viewWithTag(3) as? UILabel
     }
     
-    private var pageControl: UIPageControl {
-        return viewWithTag(4) as! UIPageControl
+    private var pageControl: UIPageControl! {
+        return viewWithTag(4) as? UIPageControl
     }
     
     private var contentWidth: CGFloat {
@@ -116,22 +141,56 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         set { contentViewWidthConstraint.constant = newValue }
     }
     
-    private var contentViewWidthConstraint: NSLayoutConstraint {
-        return contentView.constraints.filter ({ $0.identifier == "width" }).first!
+    private var contentViewWidthConstraint: NSLayoutConstraint! {
+        return contentView.constraints.find({ $0.identifier == "width" })
     }
     
+    // MARK: Update Size
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        if scrollView.delegate == nil {
-            scrollView.delegate = self
+        updateBannerFrames()
+    }
+    
+    private func updateBannerFrames() {
+        contentWidth = CGFloat(realBanners.count) * bounds.width
+        for (index, imageView) in contentView.subviews.enumerate() {
+            let origin = CGPoint(x: bounds.width * CGFloat(index), y: 0)
+            imageView.frame = CGRect(origin: origin, size: bounds.size)
         }
     }
-    func imageTaped(gesture: UIGestureRecognizer) {
-        guard let currentBanner = currentBanner else { return }
-        didSelectBanner?(currentBanner)
+    
+    // MARK: Update UI
+    
+    private func reloadData() {
+        startTimer()
+        reloadImageViews()
+        updateWithCurrentIndex(0)
+        pageControl.numberOfPages = banners.count
     }
+    
+    func reloadImageViews() {
+        contentView.subviews.forEach { $0.removeFromSuperview() }
+        for banner in realBanners {
+            let imageView = UIImageView()
+            imageView.userInteractionEnabled = true
+            imageView.contentMode = .ScaleToFill
+            imageView.sd_setImageWithURL(banner.bannerPhoto, placeholderImage: banner.bannerPlaceholderImage)
+            let tapGesture = UITapGestureRecognizer(target: self, action: "imageTaped:")
+            imageView.addGestureRecognizer(tapGesture)
+            contentView.addSubview(imageView)
+        }
+    }
+    
+    private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
+        currentIndex = index
+        pageControl.currentPage = currentIndex
+        titleLabel.text = currentBanner?.bannerTitle
+        let offset = CGPoint(x: CGFloat(realIndex) * bounds.width, y: 0)
+        scrollView.setContentOffset(offset, animated: animated)
+    }
+    
+    // MARK: IBAction
     
     private func startTimer() {
         timer(5) { [weak self] time, _ in
@@ -147,54 +206,22 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         updateWithCurrentIndex(index, animated: animated)
     }
     
+    func imageTaped(gesture: UIGestureRecognizer) {
+        guard let currentBanner = currentBanner else { return }
+        didSelectBanner?(currentBanner)
+    }
+    
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         realIndex = Int(scrollView.contentOffset.x / bounds.width)
         if currentIndex == banners.endIndex {
-            updateWithCurrentIndex(0)
+            updateWithCurrentIndex(currentIndex - banners.count)
         } else if currentIndex == -1 {
-            updateWithCurrentIndex(banners.endIndex.predecessor())
+            updateWithCurrentIndex(currentIndex + banners.count)
         } else {
             updateWithCurrentIndex(currentIndex)
         }
     }
-    
-    private func reloadData() {
-        startTimer()
-        contentView.subviews.forEach { $0.removeFromSuperview() }
-        contentWidth = CGFloat(banners.count + 2) * bounds.width
-        addImageViews()
-        pageControl.numberOfPages = banners.count
-        updateWithCurrentIndex(0)
-    }
-    
-    func addImageViews() {
-        guard !self.banners.isEmpty else { return }
-        var banners = [self.banners.last!] + self.banners
-        banners += [self.banners.first!]
-        
-        for (index, banner) in banners.enumerate() {
-            let x = CGFloat(index) * bounds.width
-            let origin = CGPoint(x: x, y: 0)
-            let imageView = UIImageView(frame: CGRect(origin: origin, size: bounds.size))
-            imageView.userInteractionEnabled = true
-            imageView.contentMode = .ScaleToFill
-            imageView.sd_setImageWithURL(banner.bannerPhoto, placeholderImage: banner.bannerPlaceholderImage)
-            let tapGesture = UITapGestureRecognizer(target: self, action: "imageTaped:")
-            imageView.addGestureRecognizer(tapGesture)
-            contentView.addSubview(imageView)
-        }
-        
-        print(banners)
-    }
-    
-    private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
-        currentIndex = index
-        pageControl.currentPage = currentIndex
-        titleLabel.text = currentBanner?.bannerTitle
-        let offset = CGPoint(x: CGFloat(realIndex) * bounds.width, y: 0)
-        scrollView.setContentOffset(offset, animated: animated)
-    }
-    
+
 }
 
 

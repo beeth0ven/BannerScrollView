@@ -9,6 +9,12 @@
 
 import UIKit
 
+extension Array {
+    func find(@noescape predicate: (Element) -> Bool) -> Element? {
+        return filter(predicate).first
+    }
+}
+
 /**
  提供常用线程的简单访问方法. 用 Qos 代表线程对应的优先级。
  - Main:                 对应主线程

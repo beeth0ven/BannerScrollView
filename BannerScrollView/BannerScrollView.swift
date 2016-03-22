@@ -31,12 +31,13 @@ extension Course: BannerType {
  Course can be represented as banner, course.name shows as bannerTitle, and course.name shows as bannerPhoto.
  */
 protocol BannerType {
-    var bannerTitle: String { get }
-    var bannerPhoto: NSURL { get }
+    var bannerTitle: String? { get }
+    var bannerPhoto: NSURL? { get }
     var bannerPlaceholderImage: UIImage? { get }
 }
 
 extension BannerType {
+    var bannerTitle: String? { return nil }
     var bannerPlaceholderImage: UIImage? { return nil }
 }
 
@@ -86,29 +87,37 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         return banners[index]
     }
     
+    private var mode: Mode {
+        return self.banners.count < 2 ? .Nomal : .Cycle
+    }
+    
     private var realBanners: [BannerType] {
-        
-        if self.banners.count < 2 {
+        switch mode {
+        case .Nomal:
             return self.banners
+        case .Cycle:
+            var banners = [self.banners.last!] + self.banners
+            banners += [self.banners.first!]
+            return banners
         }
-        
-        var banners = [self.banners.last!] + self.banners
-        banners += [self.banners.first!]
-        return banners
     }
     
     private var realIndex: Int {
         get {
-            if self.banners.count < 2 {
+            switch mode {
+            case .Nomal:
                 return currentIndex
+            case .Cycle:
+                return currentIndex + 1
             }
-            return currentIndex + 1
         }
         set {
-            if self.banners.count < 2 {
+            switch mode {
+            case .Nomal:
                 currentIndex = 0
+            case .Cycle:
+                currentIndex = newValue - 1
             }
-            currentIndex = newValue - 1
         }
     }
     
@@ -163,7 +172,6 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     
     // MARK: Update UI
     
-    
     private func reloadData() {
         startTimerIfNeeded()
         reloadImageViews()
@@ -174,7 +182,6 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     
     func reloadImageViews() {
         contentView.subviews.removeFromSuperview()
-        
         for banner in realBanners {
             let imageView = UIImageView()
             imageView.userInteractionEnabled = true
@@ -184,15 +191,14 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
             imageView.addGestureRecognizer(tapGesture)
             contentView.addSubview(imageView)
         }
-        
     }
     
-    private func updateWithCurrentIndex(index: Int, animated: Bool = false) {
+    private func updateWithCurrentIndex(index: Int) {
         currentIndex = index
         pageControl.currentPage = currentIndex
         titleLabel.text = currentBanner?.bannerTitle
         let offset = CGPoint(x: CGFloat(realIndex) * bounds.width, y: 0)
-        scrollView.setContentOffset(offset, animated: animated)
+        scrollView.setContentOffset(offset, animated: false)
     }
     
     // MARK: IBAction
@@ -215,9 +221,16 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
     }
     
     private func nextPage() {
-        let index = (currentIndex + 1) % banners.count
-        let animated = !(index == 0)
-        updateWithCurrentIndex(index, animated: animated)
+        switch mode {
+        case .Nomal:
+            break
+        case .Cycle:
+            let offset = scrollView.contentOffset + CGPoint(x: bounds.width, y: 0)
+            scrollView.setContentOffset(offset, animated: true)
+            Queue.Main.executeAfter(seconds: 0.32) {
+                self.scrollViewDidEndDecelerating(self.scrollView)
+            }
+        }
     }
     
     func imageTaped(gesture: UIGestureRecognizer) {
@@ -236,6 +249,11 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         }
     }
     
+    private enum Mode {
+        case Nomal, Cycle
+    }
 }
+
+
 
 

@@ -9,6 +9,10 @@
 
 import UIKit
 
+func +(left: CGPoint, right: CGPoint) -> CGPoint {
+    return CGPoint(x: left.x + right.x, y: left.y + right.y)
+}
+
 extension Array where Element: UIView {
     func removeFromSuperview() {
         forEach { $0.removeFromSuperview() }
@@ -125,7 +129,7 @@ func timer(duration: NSTimeInterval, start: ((time : NSTimeInterval, fomatTime :
 }
 
 extension UIImageView {
-    func sd_setImageWithURL(url: NSURL, placeholderImage: UIImage?) {
+    func sd_setImageWithURL(url: NSURL!, placeholderImage: UIImage?) {
         image = placeholderImage
         Queue.UserInitiated.execute {
             guard let

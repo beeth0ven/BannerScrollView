@@ -15,11 +15,11 @@ struct Course {
 }
 
 extension Course: BannerType {
-    var bannerTitle: String {
+    var bannerTitle: String? {
         return name
     }
     
-    var bannerPhoto: NSURL {
+    var bannerPhoto: NSURL? {
         return photo
     }
 }

@@ -180,14 +180,14 @@ class BannerScrollView: UIView, UIScrollViewDelegate {
         layoutSubviews() // Force Update Size in Cell
     }
     
-    func reloadImageViews() {
+    private func reloadImageViews() {
         contentView.subviews.removeFromSuperview()
         for banner in realBanners {
             let imageView = UIImageView()
             imageView.userInteractionEnabled = true
             imageView.contentMode = .ScaleToFill
             imageView.sd_setImageWithURL(banner.bannerPhoto, placeholderImage: banner.bannerPlaceholderImage)
-            let tapGesture = UITapGestureRecognizer(target: self, action: "imageTaped:")
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(imageTaped(_:)))
             imageView.addGestureRecognizer(tapGesture)
             contentView.addSubview(imageView)
         }
